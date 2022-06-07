@@ -7,4 +7,20 @@ urlpatterns = [
     path("create/", views.survey.create, name="survey-create"),
     path("<int:pk>/delete/", views.survey.delete, name="survey-delete"),
     path("<int:pk>/edit/", views.survey.edit, name="survey-edit"),
+    path(
+        "<int:pk>/question/",
+        views.survey.question_create,
+        name="survey-question-create",
+    ),
+    path(
+        "<int:survey_pk>/question/<int:question_pk>/delete/",
+        views.survey.question_delete,
+        name="survey-question-delete",
+    ),
+    path(
+        "<int:survey_pk>/question/<int:question_pk>/choice/",
+        views.survey.choice_create,
+        name="survey-choice-create",
+    ),
+    path("<int:pk>/start/", views.survey.start, name="survey-start"),
 ]
