@@ -1,0 +1,31 @@
+{% extends "_base.html" %}
+{% block title %}View - Surveys{% endblock %}
+
+{% block content %}
+<div class="ui center aligned basic very padded segment">
+    <h1 class="ui header">{{ survey.title }}</h1>
+    <h3 class="ui header">You have {{ num_submissions }} submissions</h3>
+    <h3 class="ui header">Survey URL: <a href="{{public_url}}">{{ public_url }}</a></h3>
+    <h1 class="ui header dividing">Results</h1>
+    {% for question in questions %}
+    <div class="ui basic padded segment left aligned">
+        <h4 class="ui header">
+            Question. {{ forloop.counter }} <br />
+            Title : {{ question.question_text }} <br />
+            Answer Type : {{ question.answer_type }}
+        </h4>
+        <ul>
+            {% for choice in question.choice_set.all %}
+            <li>
+                {{ forloop.counter }}) {{choice.choice_text}}: {{ choice.percent|floatformat }}%
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+    <a href="{% url 'survey-list' %}">
+        <div class="ui button">뒤로가기</div>
+    </a>
+
+</div>
+{% endblock %}

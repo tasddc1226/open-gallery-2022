@@ -1,0 +1,44 @@
+{% extends "_base.html" %}
+{% block title %}Create - Surveys{% endblock %}
+
+{% block content %}
+<div class="ui center aligned basic very padded segment">
+    <h1 class="ui header dividing">{{survey.title}} 설문지에 항목을 추가합니다.</h1>
+    
+    <div class="ui container left aligned">
+        {% for question in questions %}
+        <div class="ui basic padded segment">
+            <h4 class="ui header">
+                Question. {{ forloop.counter }} <br />
+                Title : {{ question.question_text }} <br />
+                Answer Type : {{ question.answer_type }}
+            </h4>
+            <ul>
+                {% for choice in question.choice_set.all %}
+                <li>
+                    {{ forloop.counter }}. {{choice.choice_text}}
+                </li>
+                {% endfor %}
+            </ul>
+            <form onclick="return confirm('해당 항목을 지울까요?')" method="post" action="{% url 'survey-question-delete' survey.pk question.pk %}" style="display: inline-block;">
+                {% csrf_token %}
+                <button class=" ui button">삭제</button>
+            </form>
+        </div>
+        {% endfor %}
+        <a href="{% url 'survey-question-create' survey.pk %}">
+            <div class="ui button">질문 추가하기</div>
+        </a>
+        {% if questions|length > 0 %}
+        <div class="ui divider"></div>
+        <form style="display: inline-block;" method="post">
+            {% csrf_token %}
+            <button type="submit" class="ui primary button">설문지 활성화</button>
+        </form>
+        <a href="{% url 'survey-list' %}">
+            <div class="ui button">뒤로가기</div>
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

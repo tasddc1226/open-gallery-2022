@@ -3,18 +3,19 @@
 
 {% block content %}
 <div class="ui center aligned basic very padded segment">
-    <h1 class="ui header">Welcome {{ request.user.username }}</h1>
+    <h1 class="ui header">환영합니다! {{ request.user.username }}님!</h1>
     <a href="{% url 'survey-create' %}">
-        <div class="ui primary button">Create a new survey</div>
+        <div class="ui primary button">설문지 생성하기</div>
     </a>
 </div>
 <div class="ui center aligned basic very padded segment">
     {% if surveys %}
-    <h2 class="ui header">Your surveys</h2>
+    <h2 class="ui header">나의 설문지 목록</h2>
     <table class="ui celled table">
         <thead>
             <tr>
                 <th>Title</th>
+                <th>Description</th>
                 <th>Created At</th>
                 <th>Actions</th>
             </tr>
@@ -23,20 +24,21 @@
             {% for survey in surveys %}
             <tr>
                 <td>{{ survey.title }}</td>
-                <td>{{ survey.created_at }}</td>
+                <td>{{ survey.description }}</td>
+                <td>{{ survey.created_at|date:"Y-m-d-D"}}</td>
                 <td>
                     {% if survey.is_active %}
                     <a href="{% url 'survey-detail' survey.pk %}">
-                        <div class="ui button">view</div>
+                        <div class="ui button">자세히</div>
                     </a>
                     {% else %}
                     <a href="{% url 'survey-edit' survey.pk %}">
-                        <div class="ui button">edit</div>
+                        <div class="ui button">수정하기</div>
                     </a>
                     {% endif %}
-                    <form method="post" action="{% url 'survey-delete' survey.pk %}" style="display: inline-block;">
+                    <form onclick="return confirm('해당 설문지를 지울까요?')" method="post" action="{% url 'survey-delete' survey.pk %}" style="display: inline-block;">
                         {% csrf_token %}
-                        <button class=" ui button">delete</button>
+                        <button class=" ui button">삭제하기</button>
                     </form>
                 </td>
             </tr>
@@ -44,8 +46,8 @@
         </tbody>
     </table>
     {% else %}
-    <h2 class="ui header">Your surveys
-        <div class="sub header">You don't have any surveys yet, try creating one first.</div>
+    <h2 class="ui header">나의 설문지
+        <div class="sub header">아직 설문지가 없네요. 생성하기를 통해서 새로운 설문지를 생성하세요!</div>
     </h2>
     {% endif %}
 
