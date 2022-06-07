@@ -1,0 +1,13 @@
+{% extends "_base.html" %}
+{% block title %}Surveys{% endblock %}
+
+{% block content %}
+<div class="ui center aligned basic very padded segment">
+    <h1 class="ui header">Survey Creator
+        <div class="sub header">설문지를 생성하고 공유하세요!</div>
+    </h1>
+    <a href="{% url 'login' %}">
+        <div class="ui primary button">시작하기</div>
+    </a>
+</div>
+{% endblock %}
