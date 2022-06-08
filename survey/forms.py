@@ -31,17 +31,17 @@ class AnswerForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         print(lists, type)
-        if type == "1":
+        if type == 1:
             choice_field = forms.ChoiceField(
                 choices=lists, widget=forms.RadioSelect, required=True
             )
-        elif type == "2":
+        elif type == 2:
             choice_field = forms.ChoiceField(
                 choices=lists,
                 widget=forms.CheckboxSelectMultiple,
                 required=True,
             )
-        elif type == "3":
+        elif type == 3:
             choice_field = forms.ChoiceField(
                 choices=lists, widget=forms.Select, required=True
             )
