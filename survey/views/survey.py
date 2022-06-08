@@ -214,3 +214,8 @@ def submit(request, survey_pk, sub_pk):
             "formset": formset,
         },
     )
+
+
+def thanks(request, pk):
+    survey = get_object_or_404(Survey, pk=pk, is_active=True)
+    return render(request, "survey/thanks.html", {"survey": survey})
