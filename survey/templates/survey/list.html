@@ -10,7 +10,7 @@
     <hr>
     <h2 class="ui header">나의 설문지 검색</h2>
     <form method="get" action="{% url 'survey-search' %}"> 
-        <input type="search" id="query" name="q" placeholder="제목으로 검색합니다...">
+        <input type="search" id="query" name="q" placeholder="제목으로 검색합니다..." required>
     </form>
     
 </div>
@@ -50,13 +50,33 @@
                 </td>
             </tr>
             {% endfor %}
+
+            <div class="pagination">
+                <span class="step-links">
+                    {% if surveys.has_previous %}
+                        <a href="?page={{ surveys.previous_page_number }}">이전으로</a>
+                    {% endif %}
+            
+                    <span class="current">
+                        Page {{ surveys.number }} of {{ surveys.paginator.num_pages }}.
+                    </span>
+            
+                    {% if surveys.has_next %}
+                        <a href="?page={{ surveys.next_page_number }}">다음으로</a>
+                    {% endif %}
+                </span>
+            </div>
         </tbody>
         <tfoot>
-            <h4 class="ui header">Totals
-                <div class="sub header">
-                    {{ total }}
-                </div>
-            </h4>
+            <tr>
+                <td>
+                    <h4 class="ui header">Totals
+                        <div class="sub header">
+                            {{ total }}
+                        </div>
+                    </h4>
+                </td>
+            </tr>
         </tfoot>
     </table>
     {% else %}

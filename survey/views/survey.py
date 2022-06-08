@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.forms.formsets import formset_factory
@@ -18,11 +19,23 @@ from ..forms import (
 
 @login_required
 def survey_list(request):
-    objs = (
+    obj_list = (
         Survey.objects.filter(author=request.user).order_by("-created_at").all()
     )
+    paginator = Paginator(obj_list, 10)
+    page = request.GET.get("page")
+    try:
+        objs = paginator.page(page)
+    except PageNotAnInteger:
+        # page가 int가 아닌 경우 1페이지로
+        objs = paginator.page(1)
+    except EmptyPage:
+        objs = paginator.page(paginator.num_pages)
+
     return render(
-        request, "survey/list.html", {"surveys": objs, "total": objs.count()}
+        request,
+        "survey/list.html",
+        {"surveys": objs, "total": obj_list.count()},
     )
 
 
