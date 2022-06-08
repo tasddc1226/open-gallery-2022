@@ -34,7 +34,15 @@ def detail(request, pk):
         raise Http404()
 
     questions = survey.question_set.all()
-    # TODO: Add Calculate results
+    # TODO: 각 항목에 대한 응답 비율 구하기
+    for question in questions:
+        choice_pks = question.choice_set.values_list("pk", flat=True)
+        total_answers = Answer.objects.filter(choice_id__in=choice_pks).count()
+        for choice in question.choice_set.all():
+            num_answers = Answer.objects.filter(choice=choice).count()
+            choice.percent = (
+                100.0 * num_answers / total_answers if total_answers else 0
+            )
 
     host = request.get_host()
     public_path = reverse("survey-start", args=[pk])
@@ -186,20 +194,28 @@ def submit(request, survey_pk, sub_pk):
     AnswerFormSet = formset_factory(
         AnswerForm, extra=len(questions), formset=BaseAnswerFormSet
     )
+
     if request.method == "POST":
-        formset = AnswerFormSet(request.POST, form_kwargs=form_kwargs)
-        selected = request.POST.getlist("form-2-choice")
-        print(selected)
-        if formset.is_valid():
-            with transaction.atomic():
-                for form in formset:
+        total_questions = int(request.POST.get("form-TOTAL_FORMS"))
+        for i in range(0, total_questions):
+            answers = request.POST.getlist(f"form-{i}-choice")
+            if len(answers) > 1:
+                print("this is Checkbox answer", answers)
+                with transaction.atomic():
+                    for choice_id in answers:
+                        Answer.objects.create(
+                            choice_id=choice_id, submission_id=sub_pk
+                        )
+            else:
+                print(answers)
+                with transaction.atomic():
                     Answer.objects.create(
-                        choice_id=form.cleaned_data["choice"],
-                        submission_id=sub_pk,
+                        choice_id=answers[0], submission_id=sub_pk
                     )
-                sub.is_complete = True
-                sub.save()
-            return redirect("survey-thanks", pk=survey_pk)
+        sub.is_complete = True
+        sub.save()
+
+        return redirect("survey-thanks", pk=survey_pk)
 
     else:
         formset = AnswerFormSet(form_kwargs=form_kwargs)

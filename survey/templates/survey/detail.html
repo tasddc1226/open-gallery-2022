@@ -17,7 +17,7 @@
         <ul>
             {% for choice in question.choice_set.all %}
             <li>
-                {{ forloop.counter }}) {{choice.choice_text}}: {{ choice.percent|floatformat }}%
+                {{ forloop.counter }}) {{choice.choice_text}}  ---------- {{ choice.percent|floatformat }}%
             </li>
             {% endfor %}
         </ul>
