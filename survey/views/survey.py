@@ -1,11 +1,19 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.forms.formsets import formset_factory
 from django.http import HttpResponse
 from django.http import Http404
 from django.urls import reverse
+from django.db import transaction
 
-from ..models import Survey, Question, Choice, Submission
-from ..forms import SurveyCreateForm, QuestionCreateForm, ChoiceCreateForm
+from ..models import Survey, Question, Choice, Submission, Answer
+from ..forms import (
+    SurveyCreateForm,
+    QuestionCreateForm,
+    ChoiceCreateForm,
+    AnswerForm,
+    BaseAnswerFormSet,
+)
 
 
 @login_required
@@ -151,3 +159,58 @@ def start(request, pk):
         return redirect("survey-submit", survey_pk=pk, sub_pk=sub.pk)
 
     return render(request, "survey/start.html", {"survey": survey})
+
+
+def submit(request, survey_pk, sub_pk):
+    try:
+        survey = Survey.objects.prefetch_related(
+            "question_set__choice_set"
+        ).get(pk=survey_pk, is_active=True)
+    except Survey.DoesNotExist:
+        raise Http404()
+
+    try:
+        sub = survey.submission_set.get(pk=sub_pk, is_complete=False)
+    except Submission.DoesNotExist:
+        raise Http404()
+
+    questions = survey.question_set.all()
+    answer_types = [q.answer_type for q in questions]
+    choices = [q.choice_set.all() for q in questions]
+    form_kwargs = {
+        "empty_permitted": False,
+        "choices": choices,
+        "answer_types": answer_types,
+    }
+
+    AnswerFormSet = formset_factory(
+        AnswerForm, extra=len(questions), formset=BaseAnswerFormSet
+    )
+    if request.method == "POST":
+        formset = AnswerFormSet(request.POST, form_kwargs=form_kwargs)
+        selected = request.POST.getlist("form-2-choice")
+        print(selected)
+        if formset.is_valid():
+            with transaction.atomic():
+                for form in formset:
+                    Answer.objects.create(
+                        choice_id=form.cleaned_data["choice"],
+                        submission_id=sub_pk,
+                    )
+                sub.is_complete = True
+                sub.save()
+            return redirect("survey-thanks", pk=survey_pk)
+
+    else:
+        formset = AnswerFormSet(form_kwargs=form_kwargs)
+
+    question_forms = zip(questions, formset)
+    return render(
+        request,
+        "survey/submit.html",
+        {
+            "survey": survey,
+            "question_forms": question_forms,
+            "formset": formset,
+        },
+    )

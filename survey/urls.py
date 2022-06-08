@@ -23,4 +23,9 @@ urlpatterns = [
         name="survey-choice-create",
     ),
     path("<int:pk>/start/", views.survey.start, name="survey-start"),
+    path(
+        "<int:survey_pk>/submit/<int:sub_pk>/",
+        views.survey.submit,
+        name="survey-submit",
+    ),
 ]
