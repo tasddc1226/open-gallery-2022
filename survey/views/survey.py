@@ -21,7 +21,9 @@ def survey_list(request):
     objs = (
         Survey.objects.filter(author=request.user).order_by("-created_at").all()
     )
-    return render(request, "survey/list.html", {"surveys": objs})
+    return render(
+        request, "survey/list.html", {"surveys": objs, "total": objs.count()}
+    )
 
 
 @login_required

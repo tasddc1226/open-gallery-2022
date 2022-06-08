@@ -30,7 +30,6 @@ class AnswerForm(forms.Form):
         lists = {(c.pk, c.choice_text) for c in choices}
         super().__init__(*args, **kwargs)
 
-        print(lists, type)
         if type == 1:
             choice_field = forms.ChoiceField(
                 choices=lists, widget=forms.RadioSelect, required=True
