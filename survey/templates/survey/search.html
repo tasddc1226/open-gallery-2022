@@ -1,23 +1,10 @@
 {% extends "_base.html" %}
-{% block title %}List - Surveys{% endblock %}
+{% block title %}Search - Surveys{% endblock %}
 
 {% block content %}
 <div class="ui center aligned basic very padded segment">
-    <h1 class="ui header">환영합니다! {{ request.user.username }}님!</h1>
-    <a href="{% url 'survey-create' %}">
-        <div class="ui primary button">설문지 생성하기</div>
-    </a>
-    <hr>
-    <h2 class="ui header">나의 설문지 검색</h2>
-    <form method="get" action="{% url 'survey-search' %}"> 
-        <input type="search" id="query" name="q" placeholder="제목으로 검색합니다...">
-    </form>
-    
-</div>
-<hr>
-<div class="ui center aligned basic very padded segment">
     {% if surveys %}
-    <h2 class="ui header">나의 설문지 목록</h2>
+    <h2 class="ui header">설문지 검색 결과</h2>
     <table class="ui celled table">
         <thead>
             <tr>
@@ -53,8 +40,8 @@
         </tbody>
     </table>
     {% else %}
-    <h2 class="ui header">나의 설문지
-        <div class="sub header">아직 설문지가 없네요. 생성하기를 통해서 새로운 설문지를 생성하세요!</div>
+    <h2 class="ui header">설문지 검색 결과
+        <div class="sub header">검색 결과가 없네요..😂</div>
     </h2>
     {% endif %}
 

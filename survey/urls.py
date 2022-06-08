@@ -29,4 +29,5 @@ urlpatterns = [
         name="survey-submit",
     ),
     path("<int:pk>/thanks/", views.survey.thanks, name="survey-thanks"),
+    path("search/", views.survey.search, name="survey-search"),
 ]

@@ -6,7 +6,7 @@ from django.http import Http404
 from django.urls import reverse
 from django.db import transaction
 
-from ..models import Survey, Question, Choice, Submission, Answer
+from ..models import Survey, Question, Submission, Answer
 from ..forms import (
     SurveyCreateForm,
     QuestionCreateForm,
@@ -25,6 +25,17 @@ def survey_list(request):
 
 
 @login_required
+def search(request):
+    query = request.GET.get("q")
+    objs = Survey.objects.all()
+
+    if query:
+        results = objs.filter(title__icontains=query)
+
+    return render(request, "survey/search.html", {"surveys": results})
+
+
+@login_required
 def detail(request, pk):
     try:
         survey = Survey.objects.prefetch_related(
@@ -34,7 +45,8 @@ def detail(request, pk):
         raise Http404()
 
     questions = survey.question_set.all()
-    # TODO: 각 항목에 대한 응답 비율 구하기
+
+    # TODO: 각 항목에 대한 응답 비율 구하는 방법 aggregate로 수정하기
     for question in questions:
         choice_pks = question.choice_set.values_list("pk", flat=True)
         total_answers = Answer.objects.filter(choice_id__in=choice_pks).count()
@@ -196,18 +208,17 @@ def submit(request, survey_pk, sub_pk):
     )
 
     if request.method == "POST":
+        # TODO: 코드 간소화 고민
         total_questions = int(request.POST.get("form-TOTAL_FORMS"))
         for i in range(0, total_questions):
             answers = request.POST.getlist(f"form-{i}-choice")
             if len(answers) > 1:
-                print("this is Checkbox answer", answers)
                 with transaction.atomic():
                     for choice_id in answers:
                         Answer.objects.create(
                             choice_id=choice_id, submission_id=sub_pk
                         )
             else:
-                print(answers)
                 with transaction.atomic():
                     Answer.objects.create(
                         choice_id=answers[0], submission_id=sub_pk
