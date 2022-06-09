@@ -131,7 +131,7 @@
 |:-:|:--|:--|
 |GET|모든 설문지 리스트 |surveys|
 |GET|특정 설문지 조회 |surveys/{survey_pk}|
-|POST|설문지 생성|surveys/create|
+|POST|설문지 생성|surveys|
 |POST|설문지 질문 생성 |surveys/{survey_pk}/question|
 |DELETE|설문지 질문 삭제 |surveys/{survey_pk}/question/{question_pk}/delete|
 |POST|설문지 항목 생성 |surveys/{survey_pk}/question/{question_pk}/choice|

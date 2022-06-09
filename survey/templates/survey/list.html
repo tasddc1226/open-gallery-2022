@@ -4,9 +4,12 @@
 {% block content %}
 <div class="ui center aligned basic very padded segment">
     <h1 class="ui header">환영합니다! {{ request.user.username }}님!</h1>
-    <a href="{% url 'survey-create' %}">
-        <div class="ui primary button">설문지 생성하기</div>
-    </a>
+    <form style="display: inline-block;" method="post" action="{% url 'survey-list-create' %}"> 
+        {% csrf_token %}
+        <button type="submit" formmethod="post">
+            <div class="ui primary button">설문지 생성하기</div>
+        </button>
+    </form>
     <hr>
     <h2 class="ui header">나의 설문지 검색</h2>
     <form method="get" action="{% url 'survey-search' %}"> 
@@ -45,7 +48,7 @@
                     {% endif %}
                     <form onclick="return confirm('해당 설문지를 지울까요?')" method="post" action="{% url 'survey-delete' survey.pk %}" style="display: inline-block;">
                         {% csrf_token %}
-                        <button class=" ui button">삭제하기</button>
+                        <button class=" ui button" name="_method" value="delete">삭제하기</button>
                     </form>
                 </td>
             </tr>

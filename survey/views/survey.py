@@ -19,25 +19,39 @@ from ..forms import (
 
 
 @login_required
-def survey_list(request):
-    obj_list = (
-        Survey.objects.filter(author=request.user).order_by("-created_at").all()
-    )
-    paginator = Paginator(obj_list, 10)
-    page = request.GET.get("page")
-    try:
-        objs = paginator.page(page)
-    except PageNotAnInteger:
-        # page가 int가 아닌 경우 1페이지로
-        objs = paginator.page(1)
-    except EmptyPage:
-        objs = paginator.page(paginator.num_pages)
+def survey_list_create(request):
+    if request.method == "GET":
+        obj_list = (
+            Survey.objects.filter(author=request.user)
+            .order_by("-created_at")
+            .all()
+        )
+        paginator = Paginator(obj_list, 10)
+        page = request.GET.get("page")
+        try:
+            objs = paginator.page(page)
+        except PageNotAnInteger:
+            # page가 int가 아닌 경우 1페이지로
+            objs = paginator.page(1)
+        except EmptyPage:
+            objs = paginator.page(paginator.num_pages)
+        return render(
+            request,
+            "survey/list.html",
+            {"surveys": objs, "total": obj_list.count()},
+        )
 
-    return render(
-        request,
-        "survey/list.html",
-        {"surveys": objs, "total": obj_list.count()},
-    )
+    elif request.method == "POST":
+        # create a new survey
+        form = SurveyCreateForm(request.POST)
+        if form.is_valid():
+            survey = form.save(commit=False)
+            survey.author = request.user
+            survey.save()
+            return redirect("survey-edit", pk=survey.id)
+    else:
+        form = SurveyCreateForm()
+    return render(request, "survey/create.html", {"form": form})
 
 
 @login_required
@@ -89,26 +103,13 @@ def detail(request, pk):
 
 
 @login_required
-def create(request):
-    if request.method == "POST":
-        form = SurveyCreateForm(request.POST)
-        if form.is_valid():
-            survey = form.save(commit=False)
-            survey.author = request.user
-            survey.save()
-            return redirect("survey-edit", pk=survey.id)
-    else:
-        form = SurveyCreateForm()
-    return render(request, "survey/create.html", {"form": form})
-
-
-@login_required
 def delete(request, pk):
+
     survey = get_object_or_404(Survey, pk=pk, author=request.user)
-    if request.method == "POST":
+    if request.POST.get("_method").upper() == "DELETE":
         survey.delete()
 
-    return redirect("survey-list")
+    return redirect("survey-list-create")
 
 
 @login_required

@@ -35,7 +35,7 @@
             {% csrf_token %}
             <button type="submit" class="ui primary button">설문지 활성화</button>
         </form>
-        <a href="{% url 'survey-list' %}">
+        <a href="{% url 'survey-list-create' %}">
             <div class="ui button">뒤로가기</div>
         </a>
         {% endif %}
