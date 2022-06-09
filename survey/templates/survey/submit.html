@@ -14,7 +14,7 @@
 </style>
 <div class="ui center aligned basic very padded segment">
     <h1 class="ui header dividing">{{ survey.title }}</h1>
-    <form method="post" novalidate>
+    <form method="post">
         {% csrf_token %}
         {{ formset.management_form }}
         {% for question, form in question_forms %}
@@ -44,6 +44,12 @@
             </div>
         </div>
         {% endfor %}
+        <div class="ui basic padded segment left aligned">
+            <h4 class="ui header">
+                마지막으로 전화번호를 입력해주세요.
+            </h4>
+            <input type="text" id="query" name="phone" placeholder="-를 빼고 입력" required>
+        </div>
         <button type="submit" class="ui primary button">제출하기</button>
     </form>
 

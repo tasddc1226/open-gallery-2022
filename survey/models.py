@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 from django.utils import timezone
 
 
@@ -55,8 +56,13 @@ class Choice(models.Model):
 class Submission(models.Model):
     """특정 설문지 질문들에 대한 답변 집합"""
 
+    phoneNumberRegex = RegexValidator(regex=r"^?1?\d{8,15}$")
+
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
+    phone = models.CharField(
+        max_length=16, unique=True, validators=[phoneNumberRegex]
+    )
     is_complete = models.BooleanField(default=False)
 
     class Meta:

@@ -224,6 +224,11 @@ def submit(request, survey_pk, sub_pk):
 
     if request.method == "POST":
         # TODO: 코드 간소화 고민
+        user_phone = request.POST.get("phone")
+        check = Submission.objects.filter(phone=user_phone).first()
+        if check:
+            raise ValueError("Duplicate phone")
+
         total_questions = int(request.POST.get("form-TOTAL_FORMS"))
         for i in range(0, total_questions):
             answers = request.POST.getlist(f"form-{i}-choice")
@@ -238,6 +243,7 @@ def submit(request, survey_pk, sub_pk):
                     Answer.objects.create(
                         choice_id=answers[0], submission_id=sub_pk
                     )
+        sub.phone = user_phone
         sub.is_complete = True
         sub.save()
 
