@@ -30,4 +30,5 @@ urlpatterns = [
     ),
     path("<int:pk>/thanks/", views.survey.thanks, name="survey-thanks"),
     path("search/", views.survey.search, name="survey-search"),
+    path("<int:pk>/download/", views.survey.download, name="survey-download"),
 ]

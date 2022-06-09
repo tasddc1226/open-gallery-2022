@@ -1,3 +1,4 @@
+import csv
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -267,3 +268,36 @@ def submit(request, survey_pk, sub_pk):
 def thanks(request, pk):
     survey = get_object_or_404(Survey, pk=pk, is_active=True)
     return render(request, "survey/thanks.html", {"survey": survey})
+
+
+@login_required
+def download(request, pk):
+    """survey detail to csv file"""
+    try:
+        survey = Survey.objects.prefetch_related(
+            "question_set__choice_set"
+        ).get(pk=pk, author=request.user, is_active=True)
+    except Survey.DoesNotExist:
+        raise Http404()
+
+    response = HttpResponse(content_type="text/csv")
+    response[
+        "Content-Disposition"
+    ] = 'attachment; filename="download_survey.csv"'
+
+    questions = survey.question_set.all()
+    choices = [list(q.choice_set.all().values()) for q in questions]
+    questions = list(questions.values())
+
+    w = csv.writer(response, delimiter=",")
+
+    for i, question in enumerate(questions):
+        w.writerow([f"Question {i+1}", question["question_text"]])
+        w.writerow(["type", question["answer_type"]])
+        for choice in choices:
+            for j, c in enumerate(choice):
+                if c["question_id"] != question["id"]:
+                    break
+                w.writerow([f"{j + 1}.", c["choice_text"]])
+
+    return response
