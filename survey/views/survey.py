@@ -15,6 +15,7 @@ from ..forms import (
     ChoiceCreateForm,
     AnswerForm,
     BaseAnswerFormSet,
+    PhoneCreateForm,
 )
 
 
@@ -65,6 +66,19 @@ def search(request):
     return render(request, "survey/search.html", {"surveys": results})
 
 
+def _calculate_rates_by_choice(questions):
+    # TODO: 각 항목에 대한 응답 비율 구하는 방법 aggregate로 수정하기
+    for question in questions:
+        choice_pks = question.choice_set.values_list("pk", flat=True)
+        total_answers = Answer.objects.filter(choice_id__in=choice_pks).count()
+        for choice in question.choice_set.all():
+            num_answers = Answer.objects.filter(choice=choice).count()
+            choice.percent = (
+                100.0 * num_answers / total_answers if total_answers else 0
+            )
+    return questions
+
+
 @login_required
 def detail(request, pk):
     try:
@@ -75,16 +89,7 @@ def detail(request, pk):
         raise Http404()
 
     questions = survey.question_set.all()
-
-    # TODO: 각 항목에 대한 응답 비율 구하는 방법 aggregate로 수정하기
-    for question in questions:
-        choice_pks = question.choice_set.values_list("pk", flat=True)
-        total_answers = Answer.objects.filter(choice_id__in=choice_pks).count()
-        for choice in question.choice_set.all():
-            num_answers = Answer.objects.filter(choice=choice).count()
-            choice.percent = (
-                100.0 * num_answers / total_answers if total_answers else 0
-            )
+    results = _calculate_rates_by_choice(questions)
 
     host = request.get_host()
     public_path = reverse("survey-start", args=[pk])
@@ -96,7 +101,7 @@ def detail(request, pk):
         {
             "survey": survey,
             "public_url": public_url,
-            "questions": questions,
+            "questions": results,
             "num_submissions": num_submissions,
         },
     )
@@ -104,9 +109,8 @@ def detail(request, pk):
 
 @login_required
 def delete(request, pk):
-
     survey = get_object_or_404(Survey, pk=pk, author=request.user)
-    if request.POST.get("_method").upper() == "DELETE":
+    if request.method == "POST":
         survey.delete()
 
     return redirect("survey-list-create")
@@ -226,33 +230,29 @@ def submit(request, survey_pk, sub_pk):
 
     if request.method == "POST":
         # TODO: 코드 간소화 고민
-        user_phone = request.POST.get("phone")
-        check = Submission.objects.filter(phone=user_phone).first()
-        if check:
-            raise ValueError("Duplicate phone")
-
-        total_questions = int(request.POST.get("form-TOTAL_FORMS"))
-        for i in range(0, total_questions):
-            answers = request.POST.getlist(f"form-{i}-choice")
-            if len(answers) > 1:
-                with transaction.atomic():
-                    for choice_id in answers:
+        form = PhoneCreateForm(request.POST)
+        if form.is_valid():
+            total_questions = int(request.POST.get("form-TOTAL_FORMS"))
+            for i in range(0, total_questions):
+                answers = request.POST.getlist(f"form-{i}-choice")
+                if len(answers) > 1:
+                    with transaction.atomic():
+                        for choice_id in answers:
+                            Answer.objects.create(
+                                choice_id=choice_id, submission_id=sub_pk
+                            )
+                else:
+                    with transaction.atomic():
                         Answer.objects.create(
-                            choice_id=choice_id, submission_id=sub_pk
+                            choice_id=answers[0], submission_id=sub_pk
                         )
-            else:
-                with transaction.atomic():
-                    Answer.objects.create(
-                        choice_id=answers[0], submission_id=sub_pk
-                    )
-        sub.phone = user_phone
-        sub.is_complete = True
-        sub.save()
+            sub.phone = request.POST.get("phone")
+            sub.is_complete = True
+            sub.save()
 
-        return redirect("survey-thanks", pk=survey_pk)
+            return redirect("survey-thanks", pk=survey_pk)
 
-    else:
-        formset = AnswerFormSet(form_kwargs=form_kwargs)
+    formset = AnswerFormSet(form_kwargs=form_kwargs)
 
     question_forms = zip(questions, formset)
     return render(

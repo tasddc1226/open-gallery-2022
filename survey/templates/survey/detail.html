@@ -4,9 +4,9 @@
 {% block content %}
 <div class="ui center aligned basic very padded segment">
     <h1 class="ui header">{{ survey.title }}</h1>
-    <h3 class="ui header">You have {{ num_submissions }} submissions</h3>
-    <h3 class="ui header">Survey URL: <a href="{{public_url}}">{{ public_url }}</a></h3>
-    <h1 class="ui header dividing">Results</h1>
+    <h3 class="ui header">현재 {{ num_submissions }}명이 응답 하였습니다.</h3>
+    <h3 class="ui header">설문지 주소 : <a href="{{public_url}}">{{ public_url }}</a></h3>
+    <h1 class="ui header dividing">설문 결과</h1>
     {% for question in questions %}
     <div class="ui basic padded segment left aligned">
         <h4 class="ui header">
@@ -27,8 +27,12 @@
         <div class="ui button">뒤로가기</div>
     </a>
     <a href="{% url 'survey-download' survey.pk %}">
-        <div class="ui button">다운로드</div>
+        <div class="primary ui button">다운로드</div>
     </a>
+    <form onclick="return confirm('해당 설문지를 지울까요?')" method="post" action="{% url 'survey-delete' survey.pk %}" style="display: inline-block;">
+        {% csrf_token %}
+        <button class="negative ui button">삭제하기</button>
+    </form>
 
 </div>
 {% endblock %}

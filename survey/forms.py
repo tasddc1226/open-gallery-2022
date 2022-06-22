@@ -1,5 +1,6 @@
 from django import forms
-from .models import Survey, Question, Choice
+from .models import Survey, Question, Choice, Submission
+from django.core.exceptions import ValidationError
 
 
 class SurveyCreateForm(forms.ModelForm):
@@ -21,6 +22,20 @@ class ChoiceCreateForm(forms.ModelForm):
     class Meta:
         model = Choice
         fields = ["choice_text"]
+
+
+class PhoneCreateForm(forms.ModelForm):
+    error_messages = {"exists_phone": "Already exists phone number."}
+
+    def clean_phone(self):
+        phone = self.cleaned_data["phone"]
+        if Submission.objects.filter(phone=phone).exists():
+            raise ValidationError(self.error_messages["exists_phone"])
+        return phone
+
+    class Meta:
+        model = Submission
+        fields = ["phone"]
 
 
 class AnswerForm(forms.Form):

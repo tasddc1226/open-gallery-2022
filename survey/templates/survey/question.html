@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="ui center aligned basic very padded segment">
-    <h1 class="ui header">Create a new question</h1>
+    <h1 class="ui header">새로운 질문을 생성합니다.</h1>
     <div class="ui container left aligned">
         <form class="ui form {% if form.errors %}error{% endif %}" method="post" novalidate>
             {% csrf_token %}
@@ -13,9 +13,9 @@
                 {{ field }}
             </div>
             {% endfor %}
-            <button type="submit" class="ui primary button">Create question</button>
+            <button type="submit" class="ui primary button">질문 생성</button>
             <a href="{% url 'survey-edit' survey.pk %}">
-                <div class="ui button">Cancel</div>
+                <div class="ui button">취소</div>
             </a>
             <div class="ui message error">
                 <div class="header">We had some issues</div>

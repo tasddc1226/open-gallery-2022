@@ -4,11 +4,11 @@
 {% block content %}
 <div class="ui center aligned basic very padded segment">
     <h1 class="ui header">{{ survey.title }}
-        <div class="sub header">You have been invited to take this survey</div>
+        <div class="sub header">이 설문 조사에 초대되었습니다. 설문을 시작하려면 아래의 버튼을 클릭하세요.</div>
     </h1>
     <form method="post" action="{% url 'survey-start' survey.pk %}" style="display: inline-block;">
         {% csrf_token %}
-        <button type="submit" class="ui primary button">Start survey
+        <button type="submit" class="ui primary button">설문 시작</button>
     </form>
 </div>
 {% endblock %}

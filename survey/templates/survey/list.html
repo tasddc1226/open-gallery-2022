@@ -14,7 +14,7 @@
         <div class="negative ui button">로그아웃</div>
     </a>
     <hr>
-    <h2 class="ui header">나의 설문지 검색</h2>
+    <h2 class="ui header">설문지 검색</h2>
     <form method="get" action="{% url 'survey-search' %}"> 
         <input type="search" id="query" name="q" placeholder="제목으로 검색합니다..." required>
     </form>
@@ -23,7 +23,7 @@
 <hr>
 <div class="ui center aligned basic very padded segment">
     {% if surveys %}
-    <h2 class="ui header">나의 설문지 목록</h2>
+    <h2 class="ui header">설문지 목록</h2>
     <table class="ui celled table">
         <thead>
             <tr>
@@ -51,7 +51,7 @@
                     {% endif %}
                     <form onclick="return confirm('해당 설문지를 지울까요?')" method="post" action="{% url 'survey-delete' survey.pk %}" style="display: inline-block;">
                         {% csrf_token %}
-                        <button class=" ui button" name="_method" value="delete">삭제하기</button>
+                        <button class="negative ui button">삭제하기</button>
                     </form>
                 </td>
             </tr>

@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="ui center aligned basic very padded segment">
-    <h1 class="ui header dividing">Add choices to question</h1>
+    <h1 class="ui header dividing">질문에 대한 응답을 생성합니다.</h1>
     <div class="ui container left aligned">
         <h4 class="ui header">
             Question: {{ question.question_text }}
@@ -23,7 +23,7 @@
                 {{ field }}
             </div>
             {% endfor %}
-            <button type="submit" class="ui primary button">Add new choice</button>
+            <button type="submit" class="ui primary button">보기 생성</button>
             <div class="ui message error">
                 <div class="header">We had some issues</div>
                 <ul class="list">
@@ -41,7 +41,7 @@
         {% if choices|length > 0 %}
         <div class="ui divider"></div>
         <a href="{% url 'survey-edit' survey.pk %}">
-            <div class="ui button">Done adding choices</div>
+            <div class="ui button">항목 생성 완료</div>
         </a>
         {% endif %}
     </div>

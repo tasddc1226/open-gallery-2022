@@ -60,9 +60,7 @@ class Submission(models.Model):
 
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
-    phone = models.CharField(
-        max_length=16, unique=True, validators=[phoneNumberRegex]
-    )
+    phone = models.CharField(max_length=16, unique=True)
     is_complete = models.BooleanField(default=False)
 
     class Meta:
