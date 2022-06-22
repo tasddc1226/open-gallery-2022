@@ -60,7 +60,7 @@ def search(request):
     objs = Survey.objects.all()
 
     if query:
-        results = objs.filter(title__icontains=query)
+        results = objs.filter(title__icontains=query, author=request.user.id)
 
     return render(request, "survey/search.html", {"surveys": results})
 

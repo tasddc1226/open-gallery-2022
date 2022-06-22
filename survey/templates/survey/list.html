@@ -10,6 +10,9 @@
             <div class="ui primary button">설문지 생성하기</div>
         </button>
     </form>
+    <a href="{% url 'logout' %}">
+        <div class="negative ui button">로그아웃</div>
+    </a>
     <hr>
     <h2 class="ui header">나의 설문지 검색</h2>
     <form method="get" action="{% url 'survey-search' %}"> 
