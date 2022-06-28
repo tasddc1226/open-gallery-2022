@@ -1,4 +1,4 @@
-## open-gallery-2022
+## survey-management
 
 ### 프로젝트 구조
 ```bash
