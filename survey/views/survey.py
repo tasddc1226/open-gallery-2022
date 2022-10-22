@@ -50,8 +50,8 @@ def survey_list_create(request):
             survey.author = request.user
             survey.save()
             return redirect("survey-edit", pk=survey.id)
-    else:
-        form = SurveyCreateForm()
+    # else:
+    #     form = SurveyCreateForm()
     return render(request, "survey/create.html", {"form": form})
 
 
@@ -288,6 +288,7 @@ def download(request, pk):
 
     questions = survey.question_set.all()
     choices = [list(q.choice_set.all().values()) for q in questions]
+    print(choices)
     questions = list(questions.values())
 
     w = csv.writer(response, delimiter=",")

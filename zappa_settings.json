@@ -1,0 +1,13 @@
+{
+    "dev": {
+        "aws_region": "ap-northeast-2",
+        "django_settings": "config.settings",
+        "project_name": "opengallery",
+        "runtime": "python3.8",
+        "s3_bucket": "open-gellery-2022",
+        "vpc_config":{
+            "SubnetIds":["subnet-0d061a76af7334da7", "subnet-0ca66aece924a175e"],
+            "SecurityGroupIds":["sgr-042fc4ab80bb5cff0", "sgr-00cb2f5b8b8b26fbc"]
+        }
+    }
+}

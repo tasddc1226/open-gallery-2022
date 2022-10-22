@@ -5,4 +5,6 @@
         "80"
     ],
     "editor.formatOnSave": true,
+    "appService.defaultWebAppToDeploy": "/subscriptions/cb495060-a067-466c-b98c-e8ec7eb72219/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/survey-manage-XYZ",
+    "appService.deploySubpath": ".",
 }

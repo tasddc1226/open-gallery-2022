@@ -1,0 +1,59 @@
+name: Deploy Lambda with Zappa
+
+# 수동으로 workflow를 실행할 수 있도록 설정했습니다. 
+# 특정 branch에 push가 되었을 때 자동으로 수행되려면 push keyword를 사용합니다.
+on:
+  workflow_dispatch:
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+# workflow 수행 환경에 현재 레포지토리의 내용을 복사해옵니다
+      - name: Checkout
+        uses: actions/checkout@v2
+
+# workflow 환경에 파이썬을 설치합니다.
+      - name: Set up python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+# 가상환경을 만듭니다. 만약 안만들어졌다면 source 명령어가 동작하지않습니다.
+      - name: Create virtual env
+        run: |
+          pip install virtualenv
+          virtualenv --python=3.8 zappa-deploy-env
+          source zappa-deploy-env/bin/activate
+# 발급받은 key를 등록함으로서, zappa 명령어 호출시, 이 설정을 사용할 수 있도록 합니다
+# 설정은 github repository 설정의 secrets에서 등록해주시면 됩니다.
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+# 설정이 잘 되었는지 체크합니다.
+# 참고로 key는 *처리되어 보이지 않으니, 뭔가가 들어있는지만 보시면 됩니다.
+      - name: Check credential
+        run: |
+          sudo aws configure list-profiles
+# 앞서 생성했던 requirements 파일을 이용해 dependency들을 가상환경에 설치합니다.
+      - name: Install Dependencies
+        run: |
+          source zappa-deploy-env/bin/activate
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+# zappa를 이용해 배포합니다.
+      - name: Deploy with zappa
+        env:
+          VIRTUAL_ENV: ./zappa-deploy-env
+        run: |
+          source zappa-deploy-env/bin/activate
+          pip install zappa
+          python manage.py makemigrations
+          zappa deploy dev
+          zappa manage dev migrate
