@@ -5,6 +5,7 @@
         "project_name": "opengallery",
         "runtime": "python3.8",
         "s3_bucket": "open-gellery-2022",
+        "remote_env": "s3://open-gellery-2022/secret.json",
         "vpc_config":{
             "SubnetIds":["subnet-0d061a76af7334da7", "subnet-0ca66aece924a175e"],
             "SecurityGroupIds":["sgr-042fc4ab80bb5cff0", "sgr-00cb2f5b8b8b26fbc"]
